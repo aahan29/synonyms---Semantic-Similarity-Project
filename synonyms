@@ -1,0 +1,19 @@
+def cosine_similarity(vec1, vec2):
+    sum_of_squares_1 = 0.0
+    sum_of_squares_2 = 0.0
+    dot_prod = 0.0
+
+    for x in vec1:
+        sum_of_squares_1 += vec1[x] * vec1[x]
+    sqrt_1 = math.sqrt(sum_of_squares_1)
+
+    for y in vec2:
+        sum_of_squares_2 += vec2[y] * vec2[y]
+    sqrt_2 = math.sqrt(sum_of_squares_2)
+
+    for key1, value1 in vec1.items():
+        if key1 in vec2:
+            value2 = vec2[key1]
+            dot_prod += value1 * value2
+
+    return dot_prod / (sqrt_1 * sqrt_2)
