@@ -1,3 +1,23 @@
+'''Semantic Similarity
+
+Author: Aahan Madhok and Yahya .
+'''
+
+import math
+
+
+def norm(vec):
+    '''Return the norm of a vector stored as a dictionary, as
+    described in the handout for Project 3.
+    '''
+
+    sum_of_squares = 0.0
+    for x in vec:
+        sum_of_squares += vec[x] * vec[x]
+
+    return math.sqrt(sum_of_squares)
+
+
 def cosine_similarity(vec1, vec2):
     sum_of_squares_1 = 0.0
     sum_of_squares_2 = 0.0
@@ -17,3 +37,23 @@ def cosine_similarity(vec1, vec2):
             dot_prod += value1 * value2
 
     return dot_prod / (sqrt_1 * sqrt_2)
+
+
+def build_semantic_descriptors(sentences):
+    
+
+
+def build_semantic_descriptors_from_files(filenames):
+    pass
+
+
+
+def most_similar_word(word, choices, semantic_descriptors, similarity_fn):
+    pass
+
+
+def run_similarity_test(filename, semantic_descriptors, similarity_fn):
+    pass
+
+
+print(cosine_similarity({"a": 1, "b": 2, "c": 3}, {"b": 4, "c": 5, "d": 6}))
