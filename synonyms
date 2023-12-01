@@ -40,8 +40,34 @@ def cosine_similarity(vec1, vec2):
 
 
 def build_semantic_descriptors(sentences):
-    
+    semantic_descriptors = {} #Creates a dictionary of all words
 
+    for sentence in range (len(sentences)): ##scrolls through each
+        unique_words  = set(sentences[sentence])
+
+        for word in unique_words: ##goes through each word in the unique_word set
+            if word not in semantic_descriptors.keys():
+                semantic_descriptors[word] = {} #makes a new empty dictionary in the dictionary
+
+    ### Now is the Dictionary within dictionaries
+
+    dictionary_words = semantic_descriptors.keys() #list of all keys
+
+    for key_word in dictionary_words: #Cycles through all the dictionary keys
+
+        for sentence_index in range(len(sentences)):
+
+            if key_word in sentences[sentence_index]: #if the dictionary word is in the sentence
+
+                for word_index in sentences[sentence_index]:
+
+                    if word_index != key_word: #checks if the current selected word is the key_word, as we dont want to make                           a value for "man" if the dictionary is "man {}"
+
+                        if semantic_descriptors[key_word][word_index] >= 1:
+                            semantic_descriptors[key_word][word_index] += 1 # adds a count of one
+
+                        else:
+                            semantic_descriptors[key_word][word_index] = 1 #otherwise, due to an empty dictionary, we need to initilaize a value. 
 
 def build_semantic_descriptors_from_files(filenames):
     pass
