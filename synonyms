@@ -37,6 +37,9 @@ def cosine_similarity(vec1, vec2):
             value2 = vec2[key1]
             dot_prod += value1 * value2
 
+    if sqrt_1 == 0 or sqrt_2 == 0:
+        return 0
+
     return dot_prod / (sqrt_1 * sqrt_2)
 
 
@@ -58,11 +61,6 @@ def build_semantic_descriptors(sentences):
 
 
 
-# def build_semantic_descriptors_from_files(filenames):
-#     for i in range(len(filenames)):
-#         open(filenames[i], "r", encoding="latin1").read().split()
-
-
 def build_semantic_descriptors_from_files(filenames):
     semantic_descriptors = {}
 
@@ -70,11 +68,7 @@ def build_semantic_descriptors_from_files(filenames):
         with open(filename, "r", encoding="latin1") as file:
             content = file.read()
             sentences = re.split(r"[.!?]", content)  # Split content into sentences
-            sentences = [sentence.strip() for sentence in sentences if sentence.strip()]  #  list comprehension in Python. # for sentence in sentences: This iterates over each element (sentence) in the sentences list.
-# if sentence.strip(): This checks if the stripped version of the current sentence is not an empty string. The strip() method removes leading and trailing whitespaces from a string. So, sentence.strip() checks if the sentence is not just whitespace.
-# Putting it all together, the list comprehension creates a new list (sentences) that contains only those sentences from the original list (sentences) where the stripped version of the sentence is not an empty string. In other words, it filters out empty sentences.
-#
-# This is often done to handle cases where there might be empty sentences in the text, and you want to exclude them from further processing. The resulting sentences list will only contain non-empty sentences.
+            sentences = [sentence.strip() for sentence in sentences if sentence.strip()]
 
             for sentence in sentences:
                 words = sentence.split()
@@ -87,7 +81,7 @@ def build_semantic_descriptors_from_files(filenames):
                         semantic_descriptors[key_word] = {}
 
                     # Update semantic descriptor based on context words in the same sentence
-                    other_words = words[:i] + words[i+1:]
+                    other_words = words[:i] + words[i + 1:]
                     other_words = [other_word.lower() for other_word in other_words]
                     for other_word in other_words:
                         semantic_descriptors[key_word][other_word] = semantic_descriptors[key_word].get(other_word, 0) + 1
@@ -95,22 +89,45 @@ def build_semantic_descriptors_from_files(filenames):
     return semantic_descriptors
 
 
-
 def most_similar_word(word, choices, semantic_descriptors, similarity_fn):
-     word_descriptor = semantic_descriptors.get(word, {})
-     best_choice = None
-     max_similarity = -1
+    word_descriptor = semantic_descriptors.get(word, {})
+    best_choice = None
+    max_similarity = -1
 
-     for choice in choices:
-         choice_descriptor = semantic_descriptors.get(choice, {})
-         similarity = similarity_fn(word_descriptor, choice_descriptor)
+    for choice in choices:
+        choice_descriptor = semantic_descriptors.get(choice, {})
+        similarity = similarity_fn(word_descriptor, choice_descriptor)
 
-         if similarity > max_similarity or (similarity == max_similarity and choice < best_choice):
-             best_choice = choice
-             max_similarity = similarity
+        if similarity > max_similarity or (similarity == max_similarity and choice < best_choice):
+            best_choice = choice
+            max_similarity = similarity
 
-     return best_choice
+    return best_choice
 
 
 def run_similarity_test(filename, semantic_descriptors, similarity_fn):
-    pass
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+
+    correct_count = 0
+    total_count = len(lines)
+
+    for line in lines:
+        parts = line.strip().split()
+        word, correct_answer, choices = parts[0], parts[1], parts[2:]
+        word = word.lower()
+        choices = [choice.lower() for choice in choices]
+        choices = [subword if "'" not in subword else subword.split("'") for subword in choices]  # Split words with apostrophes
+        guessed_answer = most_similar_word(word, choices, semantic_descriptors, similarity_fn)
+
+        if guessed_answer == correct_answer:
+            correct_count += 1
+
+    accuracy_percentage = (correct_count / total_count) * 100.0
+    return accuracy_percentage
+
+
+
+sem_descriptors = build_semantic_descriptors_from_files(["wp.txt", "sw.txt"])
+res = run_similarity_test("test.txt", sem_descriptors, cosine_similarity)
+print(res, "of the guesses were correct")
